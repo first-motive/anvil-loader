@@ -16,7 +16,9 @@ sudo bash agent/install.sh
 ```
 
 The service runs as user `anvil` (docker group), listens on `:8770`, and
-restarts automatically. Logs: `journalctl -u fm-anvil-agent`.
+restarts automatically. Logs: `journalctl -u fm-anvil-agent`. The installer
+also drops an avahi advert (`_fm-rig._tcp`, `role=anvil`) so fm-desktop's
+Settings discovers the rig on the LAN.
 
 ## API
 
