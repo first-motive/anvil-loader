@@ -1,0 +1,74 @@
+# The OpenArm v2 workcell's four cameras, as fm-rob-01 runs them. Read off the robot on
+# 2026-10-15: the USB descriptors and controls with v4l2-ctl inside the loader's ros2
+# container, and the settings anvil_camera_manager saves in /data/config/cameras/.
+# The Anvil webapp holds no camera facts beyond those saved settings.
+#
+# Consumers: fm-twin (lens and mount calibration), fm-desktop (the Robots page twin),
+# fm-skills perception. Re-read and update this file when a camera is swapped or the
+# loader's camera manager changes.
+
+model:
+  usb_name: "USB  CAMERA  4K"   # every unit reports the same name and serial (01.00.00),
+  serial: "01.00.00"             # so a camera is identified by its USB port, not its serial
+  driver: usb_cam               # launched by anvil_camera_manager in the ros2 container
+  modes:                        # MJPG and YUYV both offer every size below
+    - 3840x2160
+    - 2592x1944
+    - 2048x1536
+    - 1920x1080
+    - 1600x1200
+    - 1280x960
+    - 1280x720
+    - 1024x768
+    - 800x600
+    - 640x480
+  focus_absolute_range: [0, 1023]
+
+# What the camera manager saves and passes to usb_cam (all four identical).
+saved_settings:
+  resolution: 1920x1080
+  pixel_format: mjpeg
+  framerate: 60.0
+  camera_info_url: package://usb_cam/config/dummy_camera_info.yaml   # no lens model
+  # The manager's default is autofocus true, focus 110, which never reached the sensor
+  # (see hardware_state). Set to match the hardware on 2026-10-15 through the manager's
+  # /camera_manager/set service, so a later loader cannot start refocusing a calibrated
+  # lens. The previous files are in /data/config/cameras-backup-2026-10-15/ on the robot.
+  autofocus: false
+  focus: 0
+
+# What the hardware reports while running: autofocus off and focus 0 on every camera,
+# held over repeated reads before and after the settings above changed. A lens
+# calibration holds only while this does; recheck it after any camera or loader change.
+# The control itself moves nothing: on cam_waist, 2026-10-15, focus_absolute from 0 to
+# 1000 left image sharpness unchanged (fm-twin docs/DEPTH.md). The lens is fixed-focus
+# as far as software can reach.
+hardware_state:
+  focus_automatic_continuous: 0
+  focus_absolute: 0
+
+cameras:
+  cam_chest:
+    topic: /cam_chest/image_raw/compressed
+    usb_bus: usb-0000:04:00.0-1.3
+    urdf_link: chest_cam                 # Anvil CAD URDF optical frame
+    lens: fm-skills openarm_v2_skills_config/config/camera_chest.yaml   # fisheye, 0.80 px
+    mount: fm-skills openarm_v2_skills_config/config/cameras.yaml       # refit 2026-10-13
+  cam_waist:
+    topic: /cam_waist/image_raw/compressed
+    usb_bus: usb-0000:03:00.0-1.3
+    urdf_link: waist_cam
+    lens: null                           # not calibrated
+    mount: cad
+  cam_wrist_l:
+    topic: /cam_wrist_l/image_raw/compressed
+    usb_bus: usb-0000:06:00.0-1.3
+    urdf_link: left_wrist_cam
+    lens: null
+    mount: cad
+  cam_wrist_r:
+    topic: /cam_wrist_r/image_raw/compressed
+    usb_bus: usb-0000:05:00.0-1.3
+    urdf_link: right_wrist_cam
+    lens: null
+    mount: cad
