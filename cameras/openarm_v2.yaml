@@ -40,6 +40,9 @@ saved_settings:
 # What the hardware reports while running: autofocus off and focus 0 on every camera,
 # held over repeated reads before and after the settings above changed. A lens
 # calibration holds only while this does; recheck it after any camera or loader change.
+# The control itself moves nothing: on cam_waist, 2026-10-15, focus_absolute from 0 to
+# 1000 left image sharpness unchanged (fm-twin docs/DEPTH.md). The lens is fixed-focus
+# as far as software can reach.
 hardware_state:
   focus_automatic_continuous: 0
   focus_absolute: 0
